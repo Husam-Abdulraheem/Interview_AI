@@ -1,6 +1,6 @@
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { Route, Switch, useLocation } from "wouter";
+import { Route, Switch, useLocation, Router as WouterRouter } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AppProvider, useApp } from "./contexts/AppContext";
@@ -101,6 +101,14 @@ function Router() {
 }
 
 function App() {
+  // Detect if app is hosted under /demo/interview-ai or similar subpath
+  const getBasePath = () => {
+    if (typeof window === "undefined") return "";
+    const pathname = window.location.pathname;
+    if (pathname.startsWith("/demo/interview-ai")) return "/demo/interview-ai";
+    return "";
+  };
+
   return (
     <ErrorBoundary>
       <LanguageProvider>
@@ -108,8 +116,10 @@ function App() {
           <ThemeProvider defaultTheme="light">
             <TooltipProvider>
               <Toaster position="top-right" richColors />
-              <PortfolioBanner />
-              <Router />
+              <WouterRouter base={getBasePath()}>
+                <PortfolioBanner />
+                <Router />
+              </WouterRouter>
             </TooltipProvider>
           </ThemeProvider>
         </AppProvider>
