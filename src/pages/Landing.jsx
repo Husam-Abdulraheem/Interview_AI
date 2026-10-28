@@ -42,19 +42,19 @@ export default function Landing() {
         },
         tr: {
             brand: "InterviewAI Platformu",
-            badge: "Yapay Zeka Destekli Mülakat ve Eğitim Koçu",
-            heading1: "Kariyerinize",
-            headingHighlight: "Yapay Zeka",
-            heading2: "ile Yön Verin",
-            desc: "Gerçek mülakat senaryolarıyla pratik yapın, yapay zeka tabanlı anlık geri bildirim alın ve gelişiminizi adım adım takip edin.",
-            ctaStart: "Ücretsiz Başla",
+            badge: "Yapay Zeka Destekli Teknik Mülakat ve Eğitim Koçu",
+            heading1: "Becerilerinizi Geliştirin,",
+            headingHighlight: "Teknik Mülakatları",
+            heading2: "Güvenle Geçin",
+            desc: "Gerçekçi yazılım mühendisliği ve sistem tasarımı senaryolarıyla pratik yapın, sesli yanıt verin ve yapay zeka tabanlı anlık değerlendirmelerle güçlü ve zayıf yönlerinizi keşfedin.",
+            ctaStart: "Canlı Demoyu Keşfet",
             ctaLogin: "Giriş Yap",
             features: [
-                { title: "Anlık Geri Bildirim", desc: "Cevaplarınızı yapay zeka ile anında analiz edin." },
-                { title: "Gerçekçi Senaryolar", desc: "Sektör standartlarına uygun mülakat deneyimi." },
-                { title: "Detaylı Raporlama", desc: "Gelişim alanlarınızı nokta atışı tespit edin." }
+                { title: "Anlık Sesli Analiz", desc: "Konuşarak verdiğiniz cevaplar anında metne dönüştürülüp teknik doğrulukla analiz edilir." },
+                { title: "Sektör Standartlarında Senaryolar", desc: "Global teknoloji devlerinin mülakat formatlarına uygun soru setleri." },
+                { title: "Yapay Zeka Değerlendirme Raporu", desc: "Her oturum sonrasında detaylı puanlama, güçlü yönler ve somut gelişim tavsiyeleri." }
             ],
-            footer: "© 2026 Öğrenme Yönetim Sistemi (ÖYS). Tüm hakları saklıdır."
+            footer: "© 2026 InterviewAI Platformu. Etkileşimli Portföy Demo Sürümü (Showcase Edition)."
         }
     };
 
@@ -87,7 +87,7 @@ export default function Landing() {
             <section className="flex-1 gradient-hero flex items-center justify-center px-6 py-16 lg:py-24 relative overflow-hidden">
                 <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in-up relative z-10">
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-white text-xs sm:text-sm font-medium border-white/20 shadow-md">
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-xs sm:text-sm font-medium border border-white/20 shadow-md">
                         <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
                         <span>{content.badge}</span>
                     </div>
@@ -101,7 +101,7 @@ export default function Landing() {
                             </span>{" "}
                             {content.heading2}
                         </h1>
-                        <p className="text-base sm:text-lg md:text-xl text-blue-100/90 leading-relaxed max-w-2xl mx-auto font-normal">
+                        <p className="text-base sm:text-lg md:text-xl text-blue-100/95 leading-relaxed max-w-2xl mx-auto font-normal">
                             {content.desc}
                         </p>
                     </div>
@@ -109,7 +109,7 @@ export default function Landing() {
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-3.5 justify-center pt-4 max-w-md mx-auto">
                         <Link href="/login" className="w-full sm:w-auto flex-1">
-                            <Button className="w-full bg-white text-indigo-900 hover:bg-gray-100 font-bold px-7 py-6 text-base rounded-2xl shadow-xl shadow-black/15 transition-transform hover:scale-[1.02]">
+                            <Button className="w-full bg-white text-indigo-950 hover:bg-slate-100 font-bold px-7 py-6 text-base rounded-2xl shadow-xl shadow-black/20 transition-transform hover:scale-[1.02]">
                                 {content.ctaStart} <ArrowRight className="w-4 h-4 ml-2 rtl:rotate-180" />
                             </Button>
                         </Link>
@@ -118,10 +118,10 @@ export default function Landing() {
                     {/* Feature Highlights */}
                     <div className="pt-10 grid grid-cols-1 md:grid-cols-3 gap-5 text-left rtl:text-right max-w-5xl mx-auto">
                         {content.features.map((feature, i) => (
-                            <div key={i} className="glass-card p-6 rounded-2xl border-white/15 bg-white/10 backdrop-blur-md hover:bg-white/15 transition-all">
+                            <div key={i} className="p-6 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-md hover:bg-white/15 transition-all shadow-lg shadow-black/10">
                                 <CheckCircle2 className="w-6 h-6 text-emerald-300 mb-3" />
                                 <h3 className="text-white font-bold text-base mb-1.5 heading-font">{feature.title}</h3>
-                                <p className="text-blue-100/80 text-xs sm:text-sm leading-relaxed">{feature.desc}</p>
+                                <p className="text-blue-100/90 text-xs sm:text-sm leading-relaxed">{feature.desc}</p>
                             </div>
                         ))}
                     </div>
