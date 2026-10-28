@@ -4,6 +4,7 @@ import { Shield, Users, BookOpen, TrendingUp, Activity, UserPlus, Check, X, Edit
 import { toast } from "sonner";
 import { userAPI, courseAPI } from "@/services/api";
 import { useApp } from "@/contexts/AppContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -25,6 +26,7 @@ const PLATFORM_STATS = [
 
 export default function DashboardAdmin() {
     const { user: currentUser } = useApp();
+    const { t } = useLanguage();
     const [location, navigate] = useLocation();
     const [activeTab, setActiveTab] = useState("overview");
 
@@ -115,7 +117,6 @@ export default function DashboardAdmin() {
     const handleSaveCourse = async () => {
         try {
             if (editingCourse) {
-                // UpdateCourseDto has additionalProperties: false — send only DTO fields
                 const updatePayload = {
                     title: courseForm.title,
                     description: courseForm.description,
@@ -126,24 +127,20 @@ export default function DashboardAdmin() {
                 };
                 await courseAPI.update(editingCourse.id, updatePayload);
 
-                // --- Sync Questions ---
                 const originalQuestions = editingCourse.questions || [];
                 const currentQuestions = courseForm.questions || [];
 
-                // a. Delete removed questions
                 const currentQuestionIds = currentQuestions.map(q => q.id);
                 const questionsToDelete = originalQuestions.filter(q => !currentQuestionIds.includes(q.id));
                 for (const q of questionsToDelete) {
                     await courseAPI.deleteQuestion(q.id);
                 }
 
-                // b. Add new questions
                 const newQuestions = currentQuestions.filter(q => q.isNew);
                 if (newQuestions.length > 0) {
                     await courseAPI.addQuestions(editingCourse.id, newQuestions.map(q => q.content));
                 }
 
-                // c. Update existing questions if changed
                 const existingQuestions = currentQuestions.filter(q => !q.isNew);
                 for (const q of existingQuestions) {
                     const original = originalQuestions.find(oq => oq.id === q.id);
@@ -154,7 +151,6 @@ export default function DashboardAdmin() {
 
                 toast.success("Eğitim başarıyla güncellendi");
             } else {
-                // CreateCourseDto requires creatorId
                 const createPayload = { 
                     ...courseForm, 
                     creatorId: "",
@@ -222,34 +218,33 @@ export default function DashboardAdmin() {
         }));
     };
 
-    // --- Get Role Name ---
     const getRoleName = (roleId) => {
-        if (roleId === 1) return "Yönetici";
-        if (roleId === 2) return "Eğitmen";
-        if (roleId === 3) return "Öğrenci";
-        return "Bilinmeyen";
+        if (roleId === 0 || roleId === 1) return t("roleAdmin");
+        if (roleId === 2) return t("roleCreator");
+        if (roleId === 3) return t("roleTrainee");
+        return t("roleGuest");
     };
 
     return (
-        <DashboardLayout title="Yönetici Paneli">
+        <DashboardLayout title={t("adminTitle")}>
             <div className="p-6 space-y-6 animate-fade-in-up">
                 {/* Header */}
                 <div className="flex items-center gap-3 mb-6">
                     <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center">
-                        <Shield className="w-5 h-5 text-red-500"/>
+                        <Shield className="w-5 h-5 text-rose-500"/>
                     </div>
                     <div>
-                        <h2 className="text-lg font-bold text-foreground">Platform Yönetimi</h2>
-                        <p className="text-xs text-muted-foreground">Kullanıcıları, talepleri ve platform içeriklerini yönetin</p>
+                        <h2 className="text-lg font-bold text-foreground">{t("adminTitle")}</h2>
+                        <p className="text-xs text-muted-foreground">{t("adminSubtitle")}</p>
                     </div>
                 </div>
 
                 <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
                     <TabsList className="mb-4">
-                        <TabsTrigger value="overview">Genel Bakış</TabsTrigger>
-                        <TabsTrigger value="users">Kullanıcılar ({users.length})</TabsTrigger>
-                        <TabsTrigger value="requests">Talepler ({requests.length})</TabsTrigger>
-                        <TabsTrigger value="courses">Eğitimler ({courses.length})</TabsTrigger>
+                        <TabsTrigger value="overview">{t("tabOverview")}</TabsTrigger>
+                        <TabsTrigger value="users">{t("tabUsers")} ({users.length})</TabsTrigger>
+                        <TabsTrigger value="requests">{t("tabRequests")} ({requests.length})</TabsTrigger>
+                        <TabsTrigger value="courses">{t("tabCourses")} ({courses.length})</TabsTrigger>
                     </TabsList>
 
                     {/* OVERVIEW TAB */}
@@ -258,12 +253,12 @@ export default function DashboardAdmin() {
                             <div className="glass-card rounded-xl p-4 glow-border">
                                 <div className="w-9 h-9 rounded-lg bg-blue-500/10 flex items-center justify-center mb-3 text-blue-600"><Users className="w-5 h-5"/></div>
                                 <div className="text-2xl font-bold text-foreground mb-0.5">{loading ? "-" : users.length}</div>
-                                <div className="text-xs font-medium text-foreground mb-0.5">Toplam Kullanıcı</div>
+                                <div className="text-xs font-medium text-muted-foreground mb-0.5">{t("statTotalUsers")}</div>
                             </div>
                             <div className="glass-card rounded-xl p-4 glow-border">
-                                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3 text-emerald-400"><UserPlus className="w-5 h-5"/></div>
+                                <div className="w-9 h-9 rounded-lg bg-emerald-500/10 flex items-center justify-center mb-3 text-emerald-500"><UserPlus className="w-5 h-5"/></div>
                                 <div className="text-2xl font-bold text-foreground mb-0.5">{loading ? "-" : requests.length}</div>
-                                <div className="text-xs font-medium text-foreground mb-0.5">Bekleyen Talepler</div>
+                                <div className="text-xs font-medium text-muted-foreground mb-0.5">{t("statPendingRequests")}</div>
                             </div>
                         </div>
 
@@ -272,18 +267,18 @@ export default function DashboardAdmin() {
                             {/* Recent Users */}
                             <div className="glass-card rounded-xl border border-border p-5">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-sm font-bold text-foreground">Yeni Kayıt Olan Kullanıcılar</h3>
-                                    <Button variant="ghost" size="sm" onClick={() => handleTabChange('users')} className="text-xs text-blue-500 hover:text-blue-400 hover:bg-blue-500/10">Tümünü Gör</Button>
+                                    <h3 className="text-sm font-bold text-foreground">{t("recentUsers")}</h3>
+                                    <Button variant="ghost" size="sm" onClick={() => handleTabChange('users')} className="text-xs text-primary hover:bg-primary/10">{t("viewAll")}</Button>
                                 </div>
                                 <div className="space-y-3">
                                     {users.slice(0, 5).map(u => (
                                         <div key={u.id} className="flex justify-between items-center p-3 rounded-xl bg-secondary/30 border border-border/50 hover:bg-secondary/60 transition-colors">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-blue-500/20 to-cyan-500/20 text-blue-500 flex items-center justify-center font-bold text-xs border border-blue-500/10">
+                                                <div className="w-9 h-9 rounded-full bg-primary/20 text-primary flex items-center justify-center font-bold text-xs border border-primary/20">
                                                     {u.fullName?.[0]?.toUpperCase() || 'U'}
                                                 </div>
                                                 <div>
-                                                    <div className="text-sm font-semibold text-foreground">{u.fullName || "Bilinmeyen"}</div>
+                                                    <div className="text-sm font-semibold text-foreground">{u.fullName || "—"}</div>
                                                     <div className="text-xs text-muted-foreground">{u.email}</div>
                                                 </div>
                                             </div>
@@ -292,34 +287,34 @@ export default function DashboardAdmin() {
                                             </div>
                                         </div>
                                     ))}
-                                    {!loading && users.length === 0 && <div className="text-sm text-center text-muted-foreground py-6 bg-secondary/20 rounded-xl border border-dashed border-border">Kullanıcı bulunamadı.</div>}
+                                    {!loading && users.length === 0 && <div className="text-sm text-center text-muted-foreground py-6 bg-secondary/20 rounded-xl border border-dashed border-border">{t("emptyUsers")}</div>}
                                 </div>
                             </div>
 
                             {/* Recent Courses */}
                             <div className="glass-card rounded-xl border border-border p-5">
                                 <div className="flex justify-between items-center mb-4">
-                                    <h3 className="text-sm font-bold text-foreground">Son İçerikler</h3>
-                                    <Button variant="ghost" size="sm" onClick={() => handleTabChange('courses')} className="text-xs text-blue-500 hover:text-blue-400 hover:bg-blue-500/10">Tümünü Gör</Button>
+                                    <h3 className="text-sm font-bold text-foreground">{t("recentCourses")}</h3>
+                                    <Button variant="ghost" size="sm" onClick={() => handleTabChange('courses')} className="text-xs text-primary hover:bg-primary/10">{t("viewAll")}</Button>
                                 </div>
                                 <div className="space-y-3">
                                     {courses.slice(0, 5).map(c => (
                                         <div key={c.id} className="flex justify-between items-center p-3 rounded-xl bg-secondary/30 border border-border/50 hover:bg-secondary/60 transition-colors">
                                             <div className="flex items-center gap-3">
-                                                <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-emerald-500/20 to-teal-500/20 text-emerald-500 flex items-center justify-center font-bold border border-emerald-500/10">
+                                                <div className="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-500 flex items-center justify-center font-bold border border-emerald-500/20">
                                                     <BookOpen className="w-4 h-4"/>
                                                 </div>
                                                 <div className="min-w-0 pr-2">
                                                     <div className="text-sm font-semibold text-foreground truncate max-w-[180px] sm:max-w-xs">{c.title}</div>
-                                                    <div className="text-xs text-muted-foreground">{c.specialty || "Genel"}</div>
+                                                    <div className="text-xs text-muted-foreground">{c.specialty || t("typeGeneral")}</div>
                                                 </div>
                                             </div>
-                                            <div className="text-xs font-semibold px-2.5 py-1 bg-blue-500/10 text-blue-500 rounded-lg border border-blue-500/20 shrink-0">
-                                                {c.questions?.length || 0} Soru
+                                            <div className="text-xs font-semibold px-2.5 py-1 bg-primary/10 text-primary rounded-lg border border-primary/20 shrink-0">
+                                                {c.questions?.length || 0} {t("questionsCount")}
                                             </div>
                                         </div>
                                     ))}
-                                    {!loading && courses.length === 0 && <div className="text-sm text-center text-muted-foreground py-6 bg-secondary/20 rounded-xl border border-dashed border-border">Eğitim bulunamadı.</div>}
+                                    {!loading && courses.length === 0 && <div className="text-sm text-center text-muted-foreground py-6 bg-secondary/20 rounded-xl border border-dashed border-border">{t("emptyCourses")}</div>}
                                 </div>
                             </div>
                         </div>
@@ -328,42 +323,42 @@ export default function DashboardAdmin() {
                     {/* USERS TAB */}
                     <TabsContent value="users">
                         <div className="glass-card rounded-xl border border-border overflow-hidden p-4">
-                            <h3 className="text-lg font-semibold mb-4">Kullanıcı Yönetimi</h3>
+                            <h3 className="text-lg font-semibold mb-4 text-foreground">{t("tabUsers")}</h3>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>İsim</TableHead>
-                                        <TableHead>E-posta</TableHead>
-                                        <TableHead>Rol</TableHead>
-                                        <TableHead className="text-right">İşlemler</TableHead>
+                                        <TableHead>{t("colName")}</TableHead>
+                                        <TableHead>{t("colEmail")}</TableHead>
+                                        <TableHead>{t("colRole")}</TableHead>
+                                        <TableHead className="text-right">{t("colActions")}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {users.length === 0 ? (
-                                        <TableRow><TableCell colSpan={4} className="text-center py-4">Kullanıcı bulunamadı.</TableCell></TableRow>
+                                        <TableRow><TableCell colSpan={4} className="text-center py-4 text-muted-foreground">{t("emptyUsers")}</TableCell></TableRow>
                                     ) : (
                                         users.map(user => {
                                             // Admin (1) cannot modify SuperAdmin (0) or other Admin (1). SuperAdmin (0) can modify anyone.
                                             const isProtected = (user.role === 0 || user.role === 1) && currentUser?.role === 1;
                                             return (
                                             <TableRow key={user.id}>
-                                                <TableCell className="font-medium">{user.fullName || "—"}</TableCell>
-                                                <TableCell>{user.email}</TableCell>
+                                                <TableCell className="font-medium text-foreground">{user.fullName || "—"}</TableCell>
+                                                <TableCell className="text-muted-foreground">{user.email}</TableCell>
                                                 <TableCell>
                                                     <Select disabled={isProtected} defaultValue={String(user.role)} onValueChange={(val) => handleUpdateRole(user.id, parseInt(val))}>
                                                         <SelectTrigger className="w-32 h-8">
-                                                            <SelectValue placeholder="Rol Seç" />
+                                                            <SelectValue placeholder={t("colRole")} />
                                                         </SelectTrigger>
                                                         <SelectContent>
-                                                            <SelectItem value="0">Süper Yönetici</SelectItem>
-                                                            <SelectItem value="1">Yönetici</SelectItem>
-                                                            <SelectItem value="2">Eğitmen</SelectItem>
-                                                            <SelectItem value="3">Öğrenci</SelectItem>
+                                                            <SelectItem value="0">{t("roleAdmin")}</SelectItem>
+                                                            <SelectItem value="1">{t("roleAdmin")}</SelectItem>
+                                                            <SelectItem value="2">{t("roleCreator")}</SelectItem>
+                                                            <SelectItem value="3">{t("roleTrainee")}</SelectItem>
                                                         </SelectContent>
                                                     </Select>
                                                 </TableCell>
                                                 <TableCell className="text-right">
-                                                    <Button disabled={isProtected} variant="ghost" size="icon" onClick={() => handleDeleteUser(user.id)} className="text-red-500 hover:text-red-600 hover:bg-red-50">
+                                                    <Button disabled={isProtected} variant="ghost" size="icon" onClick={() => handleDeleteUser(user.id)} className="text-rose-500 hover:text-rose-600 hover:bg-rose-500/10">
                                                         <Trash2 className="w-4 h-4"/>
                                                     </Button>
                                                 </TableCell>
@@ -379,27 +374,27 @@ export default function DashboardAdmin() {
                     {/* REQUESTS TAB */}
                     <TabsContent value="requests">
                         <div className="glass-card rounded-xl border border-border overflow-hidden p-4">
-                            <h3 className="text-lg font-semibold mb-4">Kayıt Talepleri</h3>
+                            <h3 className="text-lg font-semibold mb-4 text-foreground">{t("tabRequests")}</h3>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>E-posta</TableHead>
-                                        <TableHead>Talep Edilen Rol</TableHead>
-                                        <TableHead className="text-right">İşlem</TableHead>
+                                        <TableHead>{t("colEmail")}</TableHead>
+                                        <TableHead>{t("colRole")}</TableHead>
+                                        <TableHead className="text-right">{t("colActions")}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {requests.length === 0 ? (
-                                        <TableRow><TableCell colSpan={3} className="text-center py-4">Bekleyen talep yok.</TableCell></TableRow>
+                                        <TableRow><TableCell colSpan={3} className="text-center py-4 text-muted-foreground">{t("emptyRequests")}</TableCell></TableRow>
                                     ) : (
                                         requests.map(req => (
                                             <TableRow key={req.id}>
-                                                <TableCell className="font-medium">{req.email}</TableCell>
-                                                <TableCell>{getRoleName(req.role)}</TableCell>
+                                                <TableCell className="font-medium text-foreground">{req.email}</TableCell>
+                                                <TableCell className="text-muted-foreground">{getRoleName(req.role)}</TableCell>
                                                 <TableCell className="text-right flex items-center justify-end gap-2">
-                                                    <Button size="sm" variant="outline" onClick={() => { setSelectedRequest(req); setIsRequestModalOpen(true); }}>Detaylar</Button>
-                                                    <Button size="sm" onClick={() => handleApproveRequest(req.id)} className="bg-emerald-500 hover:bg-emerald-600 text-white">
-                                                        <Check className="w-4 h-4 mr-2"/> Onayla
+                                                    <Button size="sm" variant="outline" onClick={() => { setSelectedRequest(req); setIsRequestModalOpen(true); }} className="border-border hover:bg-secondary">{t("detailsBtn")}</Button>
+                                                    <Button size="sm" onClick={() => handleApproveRequest(req.id)} className="bg-emerald-600 hover:bg-emerald-700 text-white">
+                                                        <Check className="w-4 h-4 mr-2"/> {t("approveBtn")}
                                                     </Button>
                                                 </TableCell>
                                             </TableRow>
@@ -414,34 +409,34 @@ export default function DashboardAdmin() {
                     <TabsContent value="courses">
                         <div className="glass-card rounded-xl border border-border overflow-hidden p-4">
                             <div className="flex justify-between items-center mb-4">
-                                <h3 className="text-lg font-semibold">Eğitim Yönetimi</h3>
-                                <Button onClick={() => openCourseModal()} className="bg-blue-600 hover:bg-blue-700 text-white">
-                                    <Plus className="w-4 h-4 mr-2"/> Eğitim Ekle
+                                <h3 className="text-lg font-semibold text-foreground">{t("tabCourses")}</h3>
+                                <Button onClick={() => openCourseModal()} className="btn-gradient">
+                                    <Plus className="w-4 h-4 mr-2"/> {t("addCourseBtn")}
                                 </Button>
                             </div>
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Başlık</TableHead>
-                                        <TableHead>Uzmanlık/Kategori</TableHead>
-                                        <TableHead>Tür</TableHead>
-                                        <TableHead className="text-right">İşlemler</TableHead>
+                                        <TableHead>{t("colTitle")}</TableHead>
+                                        <TableHead>{t("colCategory")}</TableHead>
+                                        <TableHead>{t("colType")}</TableHead>
+                                        <TableHead className="text-right">{t("colActions")}</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
                                     {courses.length === 0 ? (
-                                        <TableRow><TableCell colSpan={4} className="text-center py-4">Eğitim bulunamadı.</TableCell></TableRow>
+                                        <TableRow><TableCell colSpan={4} className="text-center py-4 text-muted-foreground">{t("emptyCourses")}</TableCell></TableRow>
                                     ) : (
                                         courses.map(course => (
                                             <TableRow key={course.id}>
-                                                <TableCell className="font-medium">{course.title}</TableCell>
-                                                <TableCell>{course.specialty || "—"}</TableCell>
-                                                <TableCell>{course.isGeneral ? "Genel" : "Özel"}</TableCell>
+                                                <TableCell className="font-medium text-foreground">{course.title}</TableCell>
+                                                <TableCell className="text-muted-foreground">{course.specialty || "—"}</TableCell>
+                                                <TableCell className="text-muted-foreground">{course.isGeneral ? t("typeGeneral") : t("typeSpecialized")}</TableCell>
                                                 <TableCell className="text-right">
-                                                    <Button variant="ghost" size="icon" onClick={() => openCourseModal(course)} className="text-blue-500 hover:text-blue-600 hover:bg-blue-50">
+                                                    <Button variant="ghost" size="icon" onClick={() => openCourseModal(course)} className="text-primary hover:text-primary hover:bg-primary/10">
                                                         <Edit className="w-4 h-4"/>
                                                     </Button>
-                                                    <Button variant="ghost" size="icon" onClick={() => handleDeleteCourse(course.id)} className="text-red-500 hover:text-red-600 hover:bg-red-50">
+                                                    <Button variant="ghost" size="icon" onClick={() => handleDeleteCourse(course.id)} className="text-rose-500 hover:text-rose-600 hover:bg-rose-500/10">
                                                         <Trash2 className="w-4 h-4"/>
                                                     </Button>
                                                 </TableCell>

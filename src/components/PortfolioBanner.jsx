@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
 import { useApp } from "@/contexts/AppContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { DEMO_USERS, mockStore } from "@/services/mockData";
 import { Sparkles, Users, Shield, GraduationCap, RotateCcw, X, Info } from "lucide-react";
 import { toast } from "sonner";
@@ -8,6 +9,7 @@ import { toast } from "sonner";
 export default function PortfolioBanner() {
     const [dismissed, setDismissed] = useState(false);
     const { user, login } = useApp();
+    const { t } = useLanguage();
     const [, navigate] = useLocation();
 
     if (dismissed) return null;
@@ -50,14 +52,14 @@ export default function PortfolioBanner() {
                 <div className="flex items-center gap-2.5 min-w-0">
                     <span className="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-400/30">
                         <Sparkles className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-                        <span>معرض الأعمال · Demo Mode</span>
+                        <span>{t("bannerTag")}</span>
                     </span>
                     <p className="text-gray-300 truncate hidden md:block">
-                        مشروع تفاعلي مع محاكاة كاملة للمقابلات والتقارير. يمكنك التبديل الفوري بين الأدوار:
+                        {t("bannerDesc")}
                     </p>
                     {user && (
                         <span className="text-gray-400 hidden lg:inline">
-                            (أنت الآن: <strong className="text-white">{activeRoleLabel}</strong>)
+                            ({t("bannerCurrentRole")} <strong className="text-white">{t(`role${activeRoleLabel}`) || activeRoleLabel}</strong>)
                         </span>
                     )}
                 </div>

@@ -5,6 +5,7 @@
 import { useState, useEffect } from "react";
 import { useLocation, useParams } from "wouter";
 import { useApp } from "@/contexts/AppContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { courseAttemptAPI } from "@/services/api";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -14,12 +15,12 @@ import {
 } from "lucide-react";
 
 // ─── Score Ring ───────────────────────────────────────────────────────────────
-function ScoreRing({ score }) {
+function ScoreRing({ score, t }) {
     const radius = 54;
     const circumference = 2 * Math.PI * radius;
     const offset = circumference - (score / 100) * circumference;
     const color = score >= 80 ? "#10B981" : score >= 60 ? "#F59E0B" : "#F43F5E";
-    const label = score >= 80 ? "Mükemmel" : score >= 70 ? "İyi" : score >= 60 ? "Yeterli" : "Geliştirilmeli";
+    const label = score >= 80 ? (t ? t("scoreExcellent") : "Mükemmel") : score >= 60 ? (t ? t("scoreGood") : "Yeterli") : (t ? t("scoreNeedsImprovement") : "Geliştirilmeli");
 
     return (
         <div className="flex flex-col items-center">
@@ -92,6 +93,7 @@ export default function Report() {
     const params = useParams();
     const [, navigate] = useLocation();
     const { reportData } = useApp();
+    const { t, language } = useLanguage();
     const [data, setData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -102,16 +104,22 @@ export default function Report() {
             if (!currentAttemptId) {
                 setData({
                     sessionId: "demo",
-                    courseTitle: reportData?.courseTitle || "Mülakat Oturumu",
+                    courseTitle: reportData?.courseTitle || (language === "ar" ? "مقابلة تجريبية" : "Interview Session"),
                     overallScore: 78,
                     completedAt: new Date().toISOString(),
-                    strengths: ["Açık iletişim stili", "Güçlü teknik bilgi", "İyi örnek kullanımı"],
-                    weaknesses: ["Yanıtlarda ölçülebilir sonuçlar eksikti", "Özlülük geliştirilebilir"],
-                    suggestions: ["STAR yöntemini pratik yapın", "Etkiyi metriklerle ölçün", "Dolgu kelimelerini azaltın"],
+                    strengths: language === "ar"
+                        ? ["أسلوب تواصل واضح وهادئ", "معرفة تقنية ممتازة بالمفاهيم", "استخدام أمثلة عملية ومقنعة"]
+                        : ["Açık iletişim stili", "Güçlü teknik bilgi", "İyi örnek kullanımı"],
+                    weaknesses: language === "ar"
+                        ? ["نقص في توظيف أرقام ونتائج قابلة للقياس", "يمكن اختصار بعض الأجوبة لزيادة التركيز"]
+                        : ["Yanıtlarda ölçülebilir sonuçlar eksikti", "Özlülük geliştirilebilir"],
+                    suggestions: language === "ar"
+                        ? ["استخدم منهجية STAR بدقة", "قم بقياس التأثير بالأرقام والنسب", "تجنب التكرار والكلمات الحشوية"]
+                        : ["STAR yöntemini pratik yapın", "Etkiyi metriklerle ölçün", "Dolgu kelimelerini azaltın"],
                     questionBreakdown: [
-                        { questionId: "q1", question: "Çözdüğünüz zorlu bir teknik problemi anlatın.", score: 82, generalFeedback: "Net yapı ve iyi örneklerle güçlü bir yanıt." },
-                        { questionId: "q2", question: "Sistem tasarımına nasıl yaklaşırsınız?", score: 75, generalFeedback: "İyi kapsam ancak trade-off'larda derinlik eksikti." },
-                        { questionId: "q3", question: "Bir ekibe liderlik ettiğiniz bir durumu anlatın.", score: 88, generalFeedback: "Net sonuçlarla mükemmel STAR yöntemi kullanımı." },
+                        { questionId: "q1", question: language === "ar" ? "تحدث عن مشكلة تقنية معقدة قمت بحلها مؤخراً." : "Çözdüğünüz zorlu bir teknik problemi anlatın.", score: 82, generalFeedback: language === "ar" ? "هيكل منظم وأمثلة برمجية واقعية." : "Net yapı ve iyi örneklerle güçlü bir yanıt." },
+                        { questionId: "q2", question: language === "ar" ? "كيف تبدأ في تصميم بنية نظام معقد وقابل للتوسع؟" : "Sistem tasarımına nasıl yaklaşırsınız?", score: 75, generalFeedback: language === "ar" ? "تغطية جيدة لكن تحتاج لتعميق التنازلات (trade-offs)." : "İyi kapsam ancak trade-off'larda derinlik eksikti." },
+                        { questionId: "q3", question: language === "ar" ? "صف موقفاً قمت فيه بقيادة فريق في مشروع حرج." : "Bir ekibe liderlik ettiğiniz bir durumu anlatın.", score: 88, generalFeedback: language === "ar" ? "استخدام ممتاز لمنهجية STAR مع نتائج واضحة." : "Net sonuçlarla mükemmel STAR yöntemi kullanımı." },
                     ],
                 });
                 setIsLoading(false);
@@ -156,43 +164,44 @@ export default function Report() {
             }
         };
         processReport();
-    }, [params.attemptId, reportData?.attemptId]);
+    }, [params.attemptId, reportData?.attemptId, language]);
 
     if (isLoading || !data) {
         return (
-            <DashboardLayout title="Performans Raporu">
+            <DashboardLayout title={t("performanceReport")}>
                 <div className="flex flex-col justify-center items-center h-96 gap-4">
                     <div className="w-12 h-12 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
-                    <p className="text-sm text-muted-foreground">Rapor hazırlanıyor...</p>
+                    <p className="text-sm text-muted-foreground">...</p>
                 </div>
             </DashboardLayout>
         );
     }
 
-    const formattedDate = new Date(data.completedAt).toLocaleDateString("tr-TR", {
+    const locale = language === "ar" ? "ar-SA" : language === "en" ? "en-US" : "tr-TR";
+    const formattedDate = new Date(data.completedAt).toLocaleDateString(locale, {
         year: "numeric", month: "long", day: "numeric"
     });
 
     return (
-        <DashboardLayout title="Performans Raporu">
+        <DashboardLayout title={t("performanceReport")}>
             <div className="p-6 lg:p-8 space-y-6 animate-fade-in-up max-w-4xl">
                 {/* ── Header ──────────────────────────────────── */}
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <Trophy className="w-5 h-5 text-amber-400" />
-                            <h2 className="text-2xl font-bold heading-font text-foreground">Performans Raporu</h2>
+                            <h2 className="text-2xl font-bold heading-font text-foreground">{t("performanceReport")}</h2>
                         </div>
                         <p className="text-sm text-muted-foreground">{data.courseTitle} · {formattedDate}</p>
                     </div>
                     <div className="flex items-center gap-2">
                         <Button variant="outline" size="sm" onClick={() => navigate("/courses")} className="text-xs h-9 border-border hover:border-primary/30 hover:text-primary">
                             <RotateCcw className="w-3.5 h-3.5 mr-1.5" />
-                            Tekrar Dene
+                            {t("tryAgain")}
                         </Button>
                         <Button size="sm" onClick={() => navigate("/courses")} className="btn-gradient text-xs h-9">
                             <BookOpen className="w-3.5 h-3.5 mr-1.5" />
-                            Yeni Eğitim
+                            {t("newCourse")}
                         </Button>
                     </div>
                 </div>
@@ -201,22 +210,21 @@ export default function Report() {
                 <div className="glass-card rounded-2xl border border-border p-8">
                     <div className="flex flex-col sm:flex-row items-center gap-8">
                         <div className="flex-shrink-0">
-                            <ScoreRing score={data.overallScore} />
+                            <ScoreRing score={data.overallScore} t={t} />
                         </div>
                         <div className="flex-1 text-center sm:text-left">
-                            <h3 className="text-xl font-bold text-foreground mb-2">Genel Puanınız</h3>
+                            <h3 className="text-xl font-bold text-foreground mb-2">{t("overallScore")}</h3>
                             <p className="text-muted-foreground leading-relaxed text-sm">
-                                Bu mülakat oturumunda <span className="font-bold text-foreground">{data.overallScore}</span> / 100 puan aldınız.
-                                Güçlü yönlerinizi ve geliştirilmesi gereken alanları aşağıda inceleyebilirsiniz.
+                                {data.overallScore} / 100
                             </p>
                             <div className="flex flex-wrap gap-2 mt-4 justify-center sm:justify-start">
                                 {data.overallScore >= 80 && (
-                                    <span className="text-xs bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-3 py-1 rounded-full font-semibold flex items-center gap-1">
-                                        <Star className="w-3 h-3 fill-current" /> Üst Düzey Performans
+                                    <span className="text-xs bg-emerald-500/10 text-emerald-500 border border-emerald-500/20 px-3 py-1 rounded-full font-semibold flex items-center gap-1">
+                                        <Star className="w-3 h-3 fill-current" /> {t("scoreExcellent")}
                                     </span>
                                 )}
                                 <span className="text-xs bg-secondary text-muted-foreground border border-border px-3 py-1 rounded-full font-semibold">
-                                    {data.questionBreakdown.length} Soru Değerlendirildi
+                                    {data.questionBreakdown.length} {t("questionsCount")}
                                 </span>
                             </div>
                         </div>
@@ -229,17 +237,17 @@ export default function Report() {
                     <div className="glass-card rounded-2xl border border-emerald-500/20 p-6 bg-emerald-500/5">
                         <div className="flex items-center gap-2 mb-4">
                             <div className="w-8 h-8 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                                <CheckCircle className="w-4 h-4 text-emerald-400" />
+                                <CheckCircle className="w-4 h-4 text-emerald-500" />
                             </div>
-                            <h3 className="text-sm font-bold text-foreground">Güçlü Yönler</h3>
+                            <h3 className="text-sm font-bold text-foreground">{t("strengths")}</h3>
                         </div>
                         {data.strengths.length === 0 ? (
-                            <p className="text-sm text-muted-foreground italic">Yapay zeka analizi bekleniyor...</p>
+                            <p className="text-sm text-muted-foreground italic">...</p>
                         ) : (
                             <ul className="space-y-2.5">
                                 {data.strengths.map((s, i) => (
                                     <li key={i} className="flex items-start gap-2.5">
-                                        <span className="text-emerald-400 font-bold mt-0.5 flex-shrink-0">✓</span>
+                                        <span className="text-emerald-500 font-bold mt-0.5 flex-shrink-0">✓</span>
                                         <span className="text-sm text-muted-foreground leading-relaxed">{s}</span>
                                     </li>
                                 ))}
@@ -251,17 +259,17 @@ export default function Report() {
                     <div className="glass-card rounded-2xl border border-amber-500/20 p-6 bg-amber-500/5">
                         <div className="flex items-center gap-2 mb-4">
                             <div className="w-8 h-8 rounded-xl bg-amber-500/20 flex items-center justify-center">
-                                <TrendingUp className="w-4 h-4 text-amber-400" />
+                                <TrendingUp className="w-4 h-4 text-amber-500" />
                             </div>
-                            <h3 className="text-sm font-bold text-foreground">Geliştirilecek Alanlar</h3>
+                            <h3 className="text-sm font-bold text-foreground">{t("weaknesses")}</h3>
                         </div>
                         {data.weaknesses.length === 0 ? (
-                            <p className="text-sm text-muted-foreground italic">Yapay zeka analizi bekleniyor...</p>
+                            <p className="text-sm text-muted-foreground italic">...</p>
                         ) : (
                             <ul className="space-y-2.5">
                                 {data.weaknesses.map((w, i) => (
                                     <li key={i} className="flex items-start gap-2.5">
-                                        <AlertTriangle className="w-3.5 h-3.5 text-amber-400 mt-0.5 flex-shrink-0" />
+                                        <AlertTriangle className="w-3.5 h-3.5 text-amber-500 mt-0.5 flex-shrink-0" />
                                         <span className="text-sm text-muted-foreground leading-relaxed">{w}</span>
                                     </li>
                                 ))}
@@ -276,10 +284,10 @@ export default function Report() {
                         <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
                             <Lightbulb className="w-4 h-4 text-primary" />
                         </div>
-                        <h3 className="text-sm font-bold text-foreground">Öneriler</h3>
+                        <h3 className="text-sm font-bold text-foreground">{t("suggestions")}</h3>
                     </div>
                     {data.suggestions.length === 0 ? (
-                        <p className="text-sm text-muted-foreground italic">Yapay zeka önerileri bekleniyor...</p>
+                        <p className="text-sm text-muted-foreground italic">...</p>
                     ) : (
                         <ul className="space-y-2.5">
                             {data.suggestions.map((s, i) => (
@@ -298,10 +306,10 @@ export default function Report() {
                         <div className="w-8 h-8 rounded-xl bg-secondary flex items-center justify-center border border-border">
                             <BookOpen className="w-4 h-4 text-muted-foreground" />
                         </div>
-                        <h3 className="text-sm font-bold text-foreground">Soru Soru Değerlendirme</h3>
+                        <h3 className="text-sm font-bold text-foreground">{t("questionsBreakdown")}</h3>
                     </div>
                     {data.questionBreakdown.length === 0 ? (
-                        <p className="text-sm text-muted-foreground italic">Henüz puanlanan cevap yok. Yapay zeka yanıtlarınızı hâlâ işliyor olabilir.</p>
+                        <p className="text-sm text-muted-foreground italic">...</p>
                     ) : (
                         <div className="space-y-3">
                             {data.questionBreakdown.map((item, i) => (

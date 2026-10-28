@@ -1,35 +1,46 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
+
 const ThemeContext = createContext(undefined);
-export function ThemeProvider({ children, defaultTheme = "light", switchable = false, }) {
+
+export function ThemeProvider({ children, defaultTheme = "light" }) {
     const [theme, setTheme] = useState(() => {
-        if (switchable) {
+        try {
             const stored = localStorage.getItem("theme");
-            return stored || defaultTheme;
+            if (stored === "dark" || stored === "light") return stored;
+            if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+                return "dark";
+            }
+        } catch {
+            // ignore
         }
         return defaultTheme;
     });
+
     useEffect(() => {
         const root = document.documentElement;
         if (theme === "dark") {
             root.classList.add("dark");
+            root.style.colorScheme = "dark";
         } else {
             root.classList.remove("dark");
-            // Ensure OS dark-mode preference doesn't override us
             root.style.colorScheme = "light";
         }
-        if (switchable) {
+        try {
             localStorage.setItem("theme", theme);
-        }
-    }, [theme, switchable]);
-    const toggleTheme = switchable
-        ? () => {
-            setTheme(prev => (prev === "light" ? "dark" : "light"));
-        }
-        : undefined;
-    return (<ThemeContext.Provider value={{ theme, toggleTheme, switchable }}>
-      {children}
-    </ThemeContext.Provider>);
+        } catch {}
+    }, [theme]);
+
+    const toggleTheme = () => {
+        setTheme(prev => (prev === "light" ? "dark" : "light"));
+    };
+
+    return (
+        <ThemeContext.Provider value={{ theme, setTheme, toggleTheme, switchable: true }}>
+            {children}
+        </ThemeContext.Provider>
+    );
 }
+
 export function useTheme() {
     const context = useContext(ThemeContext);
     if (!context) {

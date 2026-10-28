@@ -1,71 +1,127 @@
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
-import { Mic2, ArrowRight, Sparkles, CheckCircle2 } from "lucide-react";
+import { Mic2, ArrowRight, Sparkles, CheckCircle2, Play } from "lucide-react";
+import ThemeAndLanguageControls from "@/components/ThemeAndLanguageControls";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function Landing() {
+    const { language, t } = useLanguage();
+
+    const heroTexts = {
+        ar: {
+            brand: "منصة InterviewAI",
+            badge: "مدرب المقابلات والتدريب الذكي المدعوم بالذكاء الاصطناعي",
+            heading1: "طوّر مهاراتك واجتز",
+            headingHighlight: "المقابلات التقنية",
+            heading2: "بثقة واحتراف",
+            desc: "تدرّب على أسئلة حقيقية في الهندسة البرمجية وتصميم النظم، تحدّث بصوتك مباشرة واحصل على تقييم فوري يوضح نقاط قوتك ومواضع تحسينك.",
+            ctaStart: "تجربة المنصة الآن",
+            ctaLogin: "تسجيل الدخول",
+            features: [
+                { title: "تحليل صوتي فوري", desc: "حوّل إجاباتك الشفهية إلى نصوص دقيقة مع تحليل لجودة الطرح والمصطلحات." },
+                { title: "سيناريوهات واقعية", desc: "أسئلة مصممة وفق معايير المقابلات العالمية في كبرى الشركات التقنية." },
+                { title: "تقارير تقييم ذكية", desc: "درجات مئوية ونقاط قوة وضعف وتوصيات ملموسة بعد كل جلسة مقابلة." }
+            ],
+            footer: "© 2026 منصة InterviewAI. نسخة معرض الأعمال التفاعلية (Showcase Edition)."
+        },
+        en: {
+            brand: "InterviewAI Platform",
+            badge: "AI-Powered Technical Interview & Coaching Suite",
+            heading1: "Master Your Skills & Ace",
+            headingHighlight: "Technical Interviews",
+            heading2: "With Total Confidence",
+            desc: "Simulate real-world technical and system design interviews, practice speaking responses live with real-time feedback and diagnostic AI scoring.",
+            ctaStart: "Explore Live Demo",
+            ctaLogin: "Sign In",
+            features: [
+                { title: "Instant Speech Analysis", desc: "Transcribe spoken responses in real-time with nuance and terminology evaluation." },
+                { title: "Industry Standard Scenarios", desc: "Practice questions aligned with FAANG & modern tech company hiring bars." },
+                { title: "Actionable AI Reports", desc: "Clear score breakdowns, identified strengths, gaps, and targeted growth tips." }
+            ],
+            footer: "© 2026 InterviewAI Platform. Interactive Portfolio Showcase Edition."
+        },
+        tr: {
+            brand: "InterviewAI Platformu",
+            badge: "Yapay Zeka Destekli Mülakat ve Eğitim Koçu",
+            heading1: "Kariyerinize",
+            headingHighlight: "Yapay Zeka",
+            heading2: "ile Yön Verin",
+            desc: "Gerçek mülakat senaryolarıyla pratik yapın, yapay zeka tabanlı anlık geri bildirim alın ve gelişiminizi adım adım takip edin.",
+            ctaStart: "Ücretsiz Başla",
+            ctaLogin: "Giriş Yap",
+            features: [
+                { title: "Anlık Geri Bildirim", desc: "Cevaplarınızı yapay zeka ile anında analiz edin." },
+                { title: "Gerçekçi Senaryolar", desc: "Sektör standartlarına uygun mülakat deneyimi." },
+                { title: "Detaylı Raporlama", desc: "Gelişim alanlarınızı nokta atışı tespit edin." }
+            ],
+            footer: "© 2026 Öğrenme Yönetim Sistemi (ÖYS). Tüm hakları saklıdır."
+        }
+    };
+
+    const content = heroTexts[language] || heroTexts.ar;
+
     return (
-        <div className="min-h-screen flex flex-col bg-background font-sans">
+        <div className="min-h-screen flex flex-col bg-background font-sans text-foreground">
             {/* Header */}
-            <header className="sticky top-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-                <div className="container mx-auto px-6 flex items-center justify-between py-4">
+            <header className="sticky top-0 z-40 bg-card/80 backdrop-blur-md border-b border-border transition-all">
+                <div className="container mx-auto px-4 sm:px-6 flex items-center justify-between py-3.5">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20">
-                            <Mic2 className="w-6 h-6 text-primary" />
+                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center border border-primary/20 text-primary">
+                            <Mic2 className="w-5 h-5 text-primary" />
                         </div>
-                        <span className="text-xl font-bold heading-font text-foreground">ÖYS Platformu</span>
+                        <span className="text-lg sm:text-xl font-bold heading-font text-foreground">{content.brand}</span>
                     </div>
-                    <Link href="/login">
-                        <Button className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-xl">
-                            Giriş Yap
-                        </Button>
-                    </Link>
+
+                    <div className="flex items-center gap-3">
+                        <ThemeAndLanguageControls />
+                        <Link href="/login">
+                            <Button size="sm" className="bg-primary text-primary-foreground hover:bg-primary/90 font-semibold rounded-xl text-xs sm:text-sm px-4">
+                                {content.ctaLogin}
+                            </Button>
+                        </Link>
+                    </div>
                 </div>
             </header>
 
             {/* Hero Section */}
-            <section className="flex-1 gradient-hero flex items-center justify-center px-6 py-20 lg:py-32">
-                <div className="max-w-4xl mx-auto text-center space-y-10 animate-fade-in-up">
+            <section className="flex-1 gradient-hero flex items-center justify-center px-6 py-16 lg:py-24 relative overflow-hidden">
+                <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in-up relative z-10">
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full glass-card text-primary-foreground/90 text-sm font-medium border-primary/30">
-                        <Sparkles className="w-4 h-4 text-amber-300" />
-                        <span>Yapay Zeka Destekli Mülakat ve Eğitim Koçu</span>
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full glass-card text-white text-xs sm:text-sm font-medium border-white/20 shadow-md">
+                        <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+                        <span>{content.badge}</span>
                     </div>
 
                     {/* Main Heading */}
-                    <div className="space-y-6">
-                        <h1 className="text-5xl md:text-7xl font-bold text-white leading-tight heading-font">
-                            Kariyerinize <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 to-emerald-300">Yapay Zeka</span> ile Yön Verin
+                    <div className="space-y-4">
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight heading-font">
+                            {content.heading1}{" "}
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-emerald-200 to-cyan-300">
+                                {content.headingHighlight}
+                            </span>{" "}
+                            {content.heading2}
                         </h1>
-                        <p className="text-xl md:text-2xl text-blue-100/80 leading-relaxed max-w-3xl mx-auto font-light">
-                            Gerçek mülakat senaryolarıyla pratik yapın, yapay zeka tabanlı anlık geri bildirim alın ve gelişiminizi adım adım takip edin.
+                        <p className="text-base sm:text-lg md:text-xl text-blue-100/90 leading-relaxed max-w-2xl mx-auto font-normal">
+                            {content.desc}
                         </p>
                     </div>
 
                     {/* CTA Buttons */}
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-                        <Link href="/register">
-                            <Button className="bg-white text-primary hover:bg-gray-50 font-bold px-8 py-7 text-lg rounded-2xl w-full sm:w-auto shadow-xl shadow-black/10 transition-transform hover:scale-105">
-                                Ücretsiz Başla <ArrowRight className="w-5 h-5 ml-2" />
-                            </Button>
-                        </Link>
-                        <Link href="/login">
-                            <Button variant="outline" className="border-2 border-white/30 text-white hover:bg-white/10 font-bold px-8 py-7 text-lg rounded-2xl w-full sm:w-auto transition-transform hover:scale-105 backdrop-blur-sm">
-                                Zaten hesabım var
+                    <div className="flex flex-col sm:flex-row gap-3.5 justify-center pt-4 max-w-md mx-auto">
+                        <Link href="/login" className="w-full sm:w-auto flex-1">
+                            <Button className="w-full bg-white text-indigo-900 hover:bg-gray-100 font-bold px-7 py-6 text-base rounded-2xl shadow-xl shadow-black/15 transition-transform hover:scale-[1.02]">
+                                {content.ctaStart} <ArrowRight className="w-4 h-4 ml-2 rtl:rotate-180" />
                             </Button>
                         </Link>
                     </div>
 
                     {/* Feature Highlights */}
-                    <div className="pt-16 grid grid-cols-1 md:grid-cols-3 gap-6 text-left max-w-5xl mx-auto">
-                        {[
-                            { title: "Anlık Geri Bildirim", desc: "Cevaplarınızı yapay zeka ile anında analiz edin." },
-                            { title: "Gerçekçi Senaryolar", desc: "Sektör standartlarına uygun mülakat deneyimi." },
-                            { title: "Detaylı Raporlama", desc: "Gelişim alanlarınızı nokta atışı tespit edin." }
-                        ].map((feature, i) => (
-                            <div key={i} className="glass-card p-6 rounded-2xl border-white/10">
-                                <CheckCircle2 className="w-8 h-8 text-emerald-400 mb-4" />
-                                <h3 className="text-white font-bold text-lg mb-2 heading-font">{feature.title}</h3>
-                                <p className="text-blue-100/70 text-sm">{feature.desc}</p>
+                    <div className="pt-10 grid grid-cols-1 md:grid-cols-3 gap-5 text-left rtl:text-right max-w-5xl mx-auto">
+                        {content.features.map((feature, i) => (
+                            <div key={i} className="glass-card p-6 rounded-2xl border-white/15 bg-white/10 backdrop-blur-md hover:bg-white/15 transition-all">
+                                <CheckCircle2 className="w-6 h-6 text-emerald-300 mb-3" />
+                                <h3 className="text-white font-bold text-base mb-1.5 heading-font">{feature.title}</h3>
+                                <p className="text-blue-100/80 text-xs sm:text-sm leading-relaxed">{feature.desc}</p>
                             </div>
                         ))}
                     </div>
@@ -73,8 +129,8 @@ export default function Landing() {
             </section>
 
             {/* Footer */}
-            <footer className="text-center py-8 bg-background border-t border-border text-muted-foreground text-sm">
-                <p>© 2026 Öğrenme Yönetim Sistemi (ÖYS). Tüm hakları saklıdır.</p>
+            <footer className="text-center py-6 bg-card border-t border-border text-muted-foreground text-xs sm:text-sm">
+                <p>{content.footer}</p>
             </footer>
         </div>
     );

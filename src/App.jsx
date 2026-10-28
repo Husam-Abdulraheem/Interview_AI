@@ -4,6 +4,7 @@ import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { AppProvider, useApp } from "./contexts/AppContext";
+import { LanguageProvider } from "./contexts/LanguageContext";
 import PortfolioBanner from "./components/PortfolioBanner";
 
 // Pages
@@ -102,15 +103,17 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <AppProvider>
-        <ThemeProvider defaultTheme="light">
-          <TooltipProvider>
-            <Toaster position="top-right" richColors />
-            <PortfolioBanner />
-            <Router />
-          </TooltipProvider>
-        </ThemeProvider>
-      </AppProvider>
+      <LanguageProvider>
+        <AppProvider>
+          <ThemeProvider defaultTheme="light">
+            <TooltipProvider>
+              <Toaster position="top-right" richColors />
+              <PortfolioBanner />
+              <Router />
+            </TooltipProvider>
+          </ThemeProvider>
+        </AppProvider>
+      </LanguageProvider>
     </ErrorBoundary>
   );
 }

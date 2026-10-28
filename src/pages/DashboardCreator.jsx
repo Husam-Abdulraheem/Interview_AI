@@ -5,6 +5,7 @@ import { Zap, BookOpen, PlusCircle, Edit3, Trash2, Loader2, Mic, Clock, ShieldAl
 import { toast } from "sonner";
 import { courseAPI } from "@/services/api";
 import { useApp } from "@/contexts/AppContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { useLocation } from "wouter";
 
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -16,6 +17,7 @@ import { COURSE_CATEGORIES } from "@/utils/categories";
 
 export default function DashboardCreator() {
     const { user } = useApp();
+    const { t } = useLanguage();
     const [location, navigate] = useLocation();
     const [courses, setCourses] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -184,38 +186,32 @@ export default function DashboardCreator() {
 
     // ─────────────────────────────────────────────────────────────
     return (
-        <DashboardLayout title="Eğitmen Paneli">
+        <DashboardLayout title={t("creatorTitle")}>
             <div className="p-6 space-y-6 animate-fade-in-up">
 
                 {/* ── Pending Approval Banner ──────────────────── */}
                 {!isApproved && (
-                    <div className="flex items-start gap-4 p-5 rounded-2xl bg-amber-50 border border-amber-200">
-                        <div className="w-10 h-10 rounded-xl bg-amber-100 flex items-center justify-center flex-shrink-0">
-                            <Clock className="w-5 h-5 text-amber-600" />
+                    <div className="flex items-start gap-4 p-5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-foreground">
+                        <div className="w-10 h-10 rounded-xl bg-amber-500/20 flex items-center justify-center flex-shrink-0">
+                            <Clock className="w-5 h-5 text-amber-500" />
                         </div>
                         <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                                <h3 className="text-sm font-bold text-amber-800">Hesabınız Onay Bekliyor</h3>
-                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-200 text-amber-700 uppercase tracking-wider">Beklemede</span>
+                                <h3 className="text-sm font-bold text-foreground">{t("creatorPendingNotice")}</h3>
+                                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-500 border border-amber-500/30 uppercase tracking-wider">Demo Mode</span>
                             </div>
-                            <p className="text-xs text-amber-700/80 leading-relaxed mb-3">
-                                İçerik üretici hesabınız henüz bir yönetici tarafından onaylanmamış.
-                                Onay alındıktan sonra eğitim oluşturabilir, düzenleyebilir ve analiz sayfasına erişebilirsiniz.
+                            <p className="text-xs text-muted-foreground leading-relaxed mb-3">
+                                {t("creatorPendingDesc")}
                             </p>
                             <div className="flex flex-wrap gap-2 text-xs">
-                                <div className="flex items-center gap-1.5 text-amber-700 bg-amber-100 px-3 py-1.5 rounded-lg border border-amber-200">
-                                    <ShieldAlert className="w-3.5 h-3.5" />
-                                    Eğitim oluşturma — <span className="font-semibold">Kilitli</span>
-                                </div>
-                                <div className="flex items-center gap-1.5 text-blue-700 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">
-                                    <Mail className="w-3.5 h-3.5" />
-                                    Onay bildirimi e-posta ile gönderilecek
+                                <div className="flex items-center gap-1.5 text-foreground bg-secondary/80 px-3 py-1.5 rounded-lg border border-border">
+                                    <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+                                    <span>{t("bannerTag")}</span>
                                 </div>
                             </div>
                         </div>
                     </div>
                 )}
-
 
                 {/* Header */}
                 <div className="flex items-center justify-between">
@@ -224,18 +220,16 @@ export default function DashboardCreator() {
                             <Zap className="w-5 h-5 text-amber-400" />
                         </div>
                         <div>
-                            <h2 className="text-lg font-bold text-foreground">Eğitmen Paneli</h2>
-                            <p className="text-xs text-muted-foreground">Eğitimlerinizi yönetin ve öğrenci etkýleşimini takip edin</p>
+                            <h2 className="text-lg font-bold text-foreground">{t("creatorTitle")}</h2>
+                            <p className="text-xs text-muted-foreground">{t("creatorSubtitle")}</p>
                         </div>
                     </div>
                     <Button
-                        onClick={() => !isApproved ? toast.warning("Hesabınız onaylanmadan eğitim oluşturulamıyor. Lütfen yönetici onayını bekleyin.") : openCourseModal()}
-                        className={`text-xs h-9 px-4 ${isApproved ? "btn-gradient" : "bg-secondary border border-amber-500/30 text-amber-400 hover:bg-amber-500/10 cursor-not-allowed"}`}
-                        title={!isApproved ? "Hesabınız henüz onaylanmadı" : undefined}
+                        onClick={() => openCourseModal()}
+                        className="btn-gradient text-xs h-9 px-4"
                     >
-                        {isApproved
-                            ? <><PlusCircle className="w-3.5 h-3.5 mr-2" />Yeni Eğitim</>
-                            : <><Clock className="w-3.5 h-3.5 mr-2" />Onay Bekleniyor</>}
+                        <PlusCircle className="w-3.5 h-3.5 mr-2" />
+                        {t("newCourseBtn")}
                     </Button>
                 </div>
 
@@ -243,26 +237,26 @@ export default function DashboardCreator() {
                 <div className="grid grid-cols-2 gap-4">
                     {[
                         {
-                            label: "Yayınlanan Eğitimler",
+                            label: t("publishedCourses"),
                             value: loading ? "..." : courses.length,
                             icon: <BookOpen className="w-5 h-5" />,
-                            color: "text-emerald-600",
-                            bg: "bg-emerald-50 border border-emerald-100"
+                            color: "text-emerald-500",
+                            bg: "bg-emerald-500/10 border border-emerald-500/20"
                         },
                         {
-                            label: "Toplam Soru",
+                            label: t("totalQuestions"),
                             value: loading ? "..." : courses.reduce((sum, c) => sum + (c.questions?.length ?? c.questionsCount ?? 0), 0),
                             icon: <Mic className="w-5 h-5" />,
-                            color: "text-indigo-600",
-                            bg: "bg-indigo-50 border border-indigo-100"
+                            color: "text-primary",
+                            bg: "bg-primary/10 border border-primary/20"
                         },
                     ].map(stat => (
-                        <div key={stat.label} className="bg-white rounded-xl p-5 border border-gray-200 shadow-sm">
+                        <div key={stat.label} className="bg-card rounded-xl p-5 border border-border shadow-sm">
                             <div className={`w-9 h-9 rounded-lg ${stat.bg} flex items-center justify-center mb-3 ${stat.color}`}>
                                 {stat.icon}
                             </div>
-                            <div className="text-2xl font-bold text-gray-900 mb-0.5">{stat.value}</div>
-                            <div className="text-xs font-medium text-gray-500">{stat.label}</div>
+                            <div className="text-2xl font-bold text-foreground mb-0.5">{stat.value}</div>
+                            <div className="text-xs font-medium text-muted-foreground">{stat.label}</div>
                         </div>
                     ))}
                 </div>

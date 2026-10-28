@@ -5,6 +5,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { useApp } from "@/contexts/AppContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { courseAPI } from "@/services/api";
 import DashboardLayout from "@/components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -70,16 +71,16 @@ function CourseCard({ course, onSelect }) {
                     {course.specialty || "Genel Hazırlık"}
                 </span>
 
-                <h3 className="text-sm font-bold text-gray-900 mb-1.5 line-clamp-2 group-hover:text-primary transition-colors">
+                <h3 className="text-sm font-bold text-foreground mb-1.5 line-clamp-2 group-hover:text-primary transition-colors">
                     {course.title}
                 </h3>
-                <p className="text-xs text-gray-500 leading-relaxed mb-4 line-clamp-2 flex-1">
+                <p className="text-xs text-muted-foreground leading-relaxed mb-4 line-clamp-2 flex-1">
                     {course.description || "Açıklama bulunmuyor."}
                 </p>
 
                 {/* Meta */}
-                <div className="flex items-center gap-2 pt-3 border-t border-gray-100 text-xs text-gray-500">
-                    <span className="flex items-center gap-1.5 bg-gray-50 border border-gray-200 px-2.5 py-1 rounded-lg">
+                <div className="flex items-center gap-2 pt-3 border-t border-border/60 text-xs text-muted-foreground">
+                    <span className="flex items-center gap-1.5 bg-secondary/60 border border-border px-2.5 py-1 rounded-lg">
                         <Layers className="w-3 h-3 text-primary" />
                         {course.questionsCount || (course.questions?.length ?? 0)} Soru
                     </span>
@@ -103,6 +104,7 @@ function CourseCard({ course, onSelect }) {
 export default function Courses() {
     const [location, navigate] = useLocation();
     const { selectCourse } = useApp();
+    const { t } = useLanguage();
 
     const searchParams = new URLSearchParams(window.location.search);
     const initialCategory = searchParams.get("category") || "Tümü";
@@ -147,22 +149,22 @@ export default function Courses() {
     };
 
     return (
-        <DashboardLayout title="Eğitim Kütüphanesi">
+        <DashboardLayout title={t("coursesLibrary")}>
             <div className="p-6 lg:p-8 space-y-8 animate-fade-in-up">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                     <div>
                         <div className="flex items-center gap-2 mb-1">
                             <Sparkles className="w-5 h-5 text-amber-400" />
-                            <h2 className="text-2xl font-bold heading-font text-foreground">Eğitim Kütüphanesi</h2>
+                            <h2 className="text-2xl font-bold heading-font text-foreground">{t("coursesLibrary")}</h2>
                         </div>
                         <p className="text-sm text-muted-foreground">
-                            {courses.length} eğitim tüm kategorilerde mevcut
+                            {courses.length} {t("coursesCount")}
                         </p>
                     </div>
                     <div className="flex items-center gap-4 text-xs text-muted-foreground">
                         <span className="flex items-center gap-1.5 bg-secondary px-3 py-1.5 rounded-full">
-                            <BookOpen className="w-3.5 h-3.5 text-primary" />{filtered.length} eğitim
+                            <BookOpen className="w-3.5 h-3.5 text-primary" />{filtered.length} {t("coursesCount")}
                         </span>
                     </div>
                 </div>
@@ -172,7 +174,7 @@ export default function Courses() {
                     <div className="relative flex-1">
                         <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                         <Input
-                            placeholder="Eğitim, konu veya beceri ara..."
+                            placeholder={t("searchPlaceholder")}
                             value={search}
                             onChange={e => setSearch(e.target.value)}
                             className="pl-10 h-11 bg-secondary/50 border-border focus:border-primary/50 focus:ring-primary/20 text-sm"
@@ -180,7 +182,7 @@ export default function Courses() {
                     </div>
                     <div className="flex items-center gap-2 text-muted-foreground glass-card px-4 py-2 rounded-xl">
                         <Filter className="w-4 h-4" />
-                        <span className="text-sm font-medium">{filtered.length} sonuç</span>
+                        <span className="text-sm font-medium">{filtered.length}</span>
                     </div>
                 </div>
 

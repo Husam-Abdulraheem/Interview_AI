@@ -98,8 +98,8 @@ export default function Study() {
                     onClick={() => navigate("/courses")}
                     className="flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-6 group"
                 >
-                    <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
-                    Eğitim Kütüphanesine Dön
+                    <ChevronLeft className="w-4 h-4 group-hover:-translate-x-0.5 rtl:group-hover:translate-x-0.5 rtl:rotate-180 transition-transform" />
+                    العودة إلى الدورات / Eğitim Kütüphanesine Dön
                 </button>
 
                 <div className="grid lg:grid-cols-3 gap-6 lg:gap-8">

@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import DashboardLayout from "@/components/DashboardLayout";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { courseAttemptAPI } from "@/services/api";
 import { Loader2, Calendar, BookOpen, ChevronRight, Award, Trophy } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Attempts() {
     const [, navigate] = useLocation();
+    const { t, language } = useLanguage();
     const [attempts, setAttempts] = useState([]);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -26,31 +28,32 @@ export default function Attempts() {
     }, []);
 
     const formatDate = (dateString) => {
-        return new Date(dateString).toLocaleDateString("tr-TR", {
+        const locale = language === "ar" ? "ar-SA" : language === "en" ? "en-US" : "tr-TR";
+        return new Date(dateString).toLocaleDateString(locale, {
             year: "numeric", month: "short", day: "numeric",
             hour: "2-digit", minute: "2-digit"
         });
     };
 
     const getScoreConfig = (score) => {
-        if (score >= 80) return { text: "text-emerald-400", bg: "bg-emerald-500/15 border-emerald-500/20", label: "Mükemmel" };
-        if (score >= 60) return { text: "text-amber-400", bg: "bg-amber-500/15 border-amber-500/20", label: "Yeterli" };
-        return { text: "text-red-400", bg: "bg-red-500/15 border-red-500/20", label: "Geliştirilmeli" };
+        if (score >= 80) return { text: "text-emerald-500", bg: "bg-emerald-500/15 border-emerald-500/30", label: t("scoreExcellent") };
+        if (score >= 60) return { text: "text-amber-500", bg: "bg-amber-500/15 border-amber-500/30", label: t("scoreGood") };
+        return { text: "text-rose-500", bg: "bg-rose-500/15 border-rose-500/30", label: t("scoreNeedsImprovement") };
     };
 
     if (isLoading) {
         return (
-            <DashboardLayout title="Denemelerim">
+            <DashboardLayout title={t("attemptsTitle")}>
                 <div className="flex flex-col justify-center items-center h-96 gap-4">
                     <div className="w-12 h-12 rounded-full border-2 border-primary/30 border-t-primary animate-spin" />
-                    <p className="text-sm text-muted-foreground">Denemeler yükleniyor...</p>
+                    <p className="text-sm text-muted-foreground">...</p>
                 </div>
             </DashboardLayout>
         );
     }
 
     return (
-        <DashboardLayout title="Denemelerim">
+        <DashboardLayout title={t("attemptsTitle")}>
             <div className="p-6 lg:p-8 space-y-6 animate-fade-in-up max-w-5xl mx-auto">
 
                 {/* Header */}
@@ -59,8 +62,8 @@ export default function Attempts() {
                         <Trophy className="w-5 h-5 text-primary" />
                     </div>
                     <div>
-                        <h2 className="text-xl font-bold heading-font text-foreground">Mülakat Geçmişi</h2>
-                        <p className="text-muted-foreground text-sm">Geçmiş performansınızı ve yapay zeka değerlendirmelerini inceleyin.</p>
+                        <h2 className="text-xl font-bold heading-font text-foreground">{t("attemptsTitle")}</h2>
+                        <p className="text-muted-foreground text-sm">{t("attemptsSubtitle")}</p>
                     </div>
                 </div>
 
@@ -69,15 +72,15 @@ export default function Attempts() {
                         <div className="w-20 h-20 rounded-2xl bg-secondary flex items-center justify-center mb-5 border border-border">
                             <BookOpen className="w-9 h-9 text-muted-foreground" />
                         </div>
-                        <h3 className="text-lg font-bold text-foreground mb-2">Henüz Deneme Yok</h3>
+                        <h3 className="text-lg font-bold text-foreground mb-2">{t("noAttemptsYet")}</h3>
                         <p className="text-muted-foreground mb-6 max-w-sm text-sm leading-relaxed">
-                            Henüz hiçbir eğitim mülakatını tamamlamadınız. İlk oturumunuzu başlatmak için Eğitimler bölümüne gidin.
+                            {t("noAttemptsDesc")}
                         </p>
                         <button
                             onClick={() => navigate("/courses")}
                             className="btn-gradient px-7 py-2.5 rounded-xl font-semibold text-sm shadow-lg shadow-primary/20"
                         >
-                            Eğitimlere Göz At
+                            {t("browseCourses")}
                         </button>
                     </div>
                 ) : (
