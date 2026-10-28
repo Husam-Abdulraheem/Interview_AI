@@ -35,11 +35,6 @@ export default function DashboardLayout({ children, title }) {
     navigate("/login");
   };
   const handleNav = (path) => {
-    const comingSoon = ["/settings"];
-    if (comingSoon.includes(path)) {
-      toast.info("Bu özellik yakında eklenecektir");
-      return;
-    }
     navigate(path);
     setMobileOpen(false);
   };

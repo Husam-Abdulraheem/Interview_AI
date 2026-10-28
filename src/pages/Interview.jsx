@@ -91,6 +91,7 @@ export default function Interview() {
     const [isEditing, setIsEditing] = useState(false);
     const [submitted, setSubmitted] = useState(new Set());
     const [timerKey, setTimerKey] = useState(0);
+    const [speechLang, setSpeechLang] = useState("ar-SA");
 
     const mediaRecorderRef = useRef(null);
     const recognitionRef = useRef(null);
@@ -162,7 +163,7 @@ export default function Interview() {
                 recognitionRef.current = recognition;
                 recognition.continuous = true;
                 recognition.interimResults = true;
-                recognition.lang = "tr-TR";
+                recognition.lang = speechLang;
                 let finalTranscript = "";
                 recognition.onresult = (event) => {
                     let interim = "";
@@ -325,17 +326,43 @@ export default function Interview() {
 
                     {/* Recording Controls */}
                     <div className="glass-card rounded-2xl border border-border p-6">
-                        <div className="flex items-center justify-between mb-5">
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-5">
                             <div className="flex items-center gap-2">
                                 <Volume2 className="w-4 h-4 text-muted-foreground" />
-                                <span className="text-sm font-semibold text-foreground">Sesli Yanıt</span>
+                                <span className="text-sm font-semibold text-foreground">Sesli Yanıt / إجابة صوتية</span>
                             </div>
-                            {recordingState === "recording" && (
-                                <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-full">
-                                    <div className="w-2 h-2 rounded-full bg-rose-500 recording-pulse" />
-                                    <span className="text-xs text-red-400 font-bold">Kayıt Yapılıyor</span>
+                            <div className="flex items-center gap-2">
+                                {/* Language Switcher */}
+                                <div className="inline-flex items-center bg-secondary/80 p-0.5 rounded-lg border border-border text-xs">
+                                    <button
+                                        type="button"
+                                        onClick={() => { setSpeechLang("ar-SA"); toast.info("تم ضبط لغة التعرف الصوتي: العربية"); }}
+                                        className={`px-2 py-1 rounded-md font-medium transition-all ${speechLang === "ar-SA" ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                                    >
+                                        🇸🇦 عربي
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setSpeechLang("en-US"); toast.info("Speech language set to English"); }}
+                                        className={`px-2 py-1 rounded-md font-medium transition-all ${speechLang === "en-US" ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                                    >
+                                        🇺🇸 EN
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={() => { setSpeechLang("tr-TR"); toast.info("Ses tanıma dili Türkçe olarak ayarlandı"); }}
+                                        className={`px-2 py-1 rounded-md font-medium transition-all ${speechLang === "tr-TR" ? "bg-primary text-white shadow-sm" : "text-muted-foreground hover:text-foreground"}`}
+                                    >
+                                        🇹🇷 TR
+                                    </button>
                                 </div>
-                            )}
+                                {recordingState === "recording" && (
+                                    <div className="flex items-center gap-2 bg-red-500/10 border border-red-500/20 px-3 py-1.5 rounded-full">
+                                        <div className="w-2 h-2 rounded-full bg-rose-500 recording-pulse" />
+                                        <span className="text-xs text-red-400 font-bold">Kayıt Yapılıyor</span>
+                                    </div>
+                                )}
+                            </div>
                         </div>
 
                         <div className="mb-6">
