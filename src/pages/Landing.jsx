@@ -86,9 +86,9 @@ export default function Landing() {
             {/* Hero Section */}
             <section className="flex-1 gradient-hero flex items-center justify-center px-6 py-16 lg:py-24 relative overflow-hidden">
                 <div className="max-w-4xl mx-auto text-center space-y-8 animate-fade-in-up relative z-10">
-                    {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 backdrop-blur-md text-white text-xs sm:text-sm font-medium border border-white/20 shadow-md">
-                        <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+                    {/* Cyber Badge */}
+                    <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-indigo-500/10 backdrop-blur-md text-indigo-200 text-xs sm:text-sm font-medium border border-indigo-400/30 shadow-[0_0_20px_rgba(99,102,241,0.25)]">
+                        <Sparkles className="w-4 h-4 text-cyan-300 animate-pulse" />
                         <span>{content.badge}</span>
                     </div>
 
@@ -96,12 +96,12 @@ export default function Landing() {
                     <div className="space-y-4">
                         <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white leading-tight heading-font">
                             {content.heading1}{" "}
-                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-emerald-200 to-cyan-300">
+                            <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 via-indigo-200 to-purple-300">
                                 {content.headingHighlight}
                             </span>{" "}
                             {content.heading2}
                         </h1>
-                        <p className="text-base sm:text-lg md:text-xl text-blue-100/95 leading-relaxed max-w-2xl mx-auto font-normal">
+                        <p className="text-base sm:text-lg md:text-xl text-slate-300 leading-relaxed max-w-2xl mx-auto font-normal">
                             {content.desc}
                         </p>
                     </div>
@@ -109,7 +109,7 @@ export default function Landing() {
                     {/* CTA Buttons */}
                     <div className="flex flex-col sm:flex-row gap-3.5 justify-center pt-4 max-w-md mx-auto">
                         <Link href="/login" className="w-full sm:w-auto flex-1">
-                            <Button className="w-full bg-white text-indigo-950 hover:bg-slate-100 font-bold px-7 py-6 text-base rounded-2xl shadow-xl shadow-black/20 transition-transform hover:scale-[1.02]">
+                            <Button className="w-full bg-gradient-to-r from-indigo-500 to-cyan-500 text-white hover:from-indigo-600 hover:to-cyan-600 font-bold px-7 py-6 text-base rounded-2xl shadow-[0_0_30px_rgba(99,102,241,0.4)] transition-all hover:scale-[1.02] border border-cyan-300/30">
                                 {content.ctaStart} <ArrowRight className="w-4 h-4 ml-2 rtl:rotate-180" />
                             </Button>
                         </Link>
@@ -118,10 +118,12 @@ export default function Landing() {
                     {/* Feature Highlights */}
                     <div className="pt-10 grid grid-cols-1 md:grid-cols-3 gap-5 text-left rtl:text-right max-w-5xl mx-auto">
                         {content.features.map((feature, i) => (
-                            <div key={i} className="p-6 rounded-2xl border border-white/15 bg-white/10 backdrop-blur-md hover:bg-white/15 transition-all shadow-lg shadow-black/10">
-                                <CheckCircle2 className="w-6 h-6 text-emerald-300 mb-3" />
+                            <div key={i} className="p-6 rounded-2xl border border-white/10 bg-slate-900/60 backdrop-blur-xl hover:bg-slate-900/80 hover:border-indigo-500/40 transition-all shadow-xl hover:shadow-[0_0_25px_rgba(99,102,241,0.15)] group">
+                                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-400/20 flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+                                    <CheckCircle2 className="w-5 h-5 text-cyan-300" />
+                                </div>
                                 <h3 className="text-white font-bold text-base mb-1.5 heading-font">{feature.title}</h3>
-                                <p className="text-blue-100/90 text-xs sm:text-sm leading-relaxed">{feature.desc}</p>
+                                <p className="text-slate-300/90 text-xs sm:text-sm leading-relaxed">{feature.desc}</p>
                             </div>
                         ))}
                     </div>
